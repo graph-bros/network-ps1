@@ -40,7 +40,7 @@ def get_summary(name, gsp_vals, giant_n, gn):
     mean = gsp_vals.mean()
     summary[name] = {"number": number, "total": total,
                      "max": maximum, "mean": mean,
-		             "giant_component_n": giant_n, "network_size": gn}
+		     "giant_component_n": giant_n, "network_size": gn}
     return summary
 
 def to_json(data, file_name):
