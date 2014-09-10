@@ -1,5 +1,5 @@
-from os import listdir, stat, sys
-from os.path import isfile, join, basename
+from os import listdir, stat, sys, makedirs
+from os.path import isfile, join, basename, isdir
 import time
 import multiprocessing
 import json
@@ -80,11 +80,15 @@ if __name__=="__main__":
 
     fb_folder = sys.argv[1]
     fb_file_paths = sorted(get_file_paths(fb_folder))
+    output_folder = "out"
 
     if len(sys.argv) > 3:
         start_point = int(sys.argv[2])
         end_point = int(sys.argv[3])
         fb_file_paths = fb_file_paths[start_point:end_point]
+
+    if not isdir(output_folder):
+        makedirs(output_folder)
 
     p = multiprocessing.Pool(multiprocessing.cpu_count() - 2)
     p.map(job, fb_file_paths)
