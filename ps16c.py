@@ -2,6 +2,7 @@ from os import listdir, sys
 from os.path import isfile, join, basename
 import multiprocessing
 import networkx as nx
+from sklearn.utils.graph import graph_shortest_path as gsp
 
 
 def get_file_paths(root):
@@ -14,6 +15,10 @@ def get_file_paths(root):
 def get_max_component(graph):
     components = nx.connected_component_subgraphs(graph)
     return components.next()
+
+def get_gsp(component):
+	am = nx.adjacency_matrix(component)
+	return gsp(am, directed=False)
 
 def job(file_path):
     file_name = basename(file_path)
