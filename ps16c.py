@@ -1,6 +1,8 @@
-from os import listdir, sys
+from os import listdir, stat, sys
 from os.path import isfile, join, basename
+import time
 import multiprocessing
+import json
 import networkx as nx
 from sklearn.utils.graph import graph_shortest_path as gsp
 
@@ -17,14 +19,39 @@ def get_max_component(graph):
     return components.next()
 
 def get_gsp(component):
-	am = nx.adjacency_matrix(component)
-	return gsp(am, directed=False)
+    am = nx.adjacency_matrix(component)
+    return gsp(am, directed=False)
+
+def get_summary(name, gsp_vals):
+    gsp_vals = gsp_vals[gsp_vals != 0]
+    summary = {}
+    total = gsp_vals.sum()
+    number = len(gsp_vals)
+    maximum = gsp_vals.max()
+    mean = gsp_vals.mean()
+    summary[name] = {"number": number, "total": total,
+                     "max": maximum, "mean": mean}
+    return summary
+
+def to_json(data, file_name):
+    json.dump(data, open(file_name, "w"))
 
 def job(file_path):
     file_name = basename(file_path)
+    print ">>> Doing: " + file_name
+    start_time = time.time()
+
     g = nx.read_edgelist(file_path)
     giant_component = get_max_component(g)
+    gsp_vals = get_gsp(giant_component)
+    summary = get_summary(file_name, gsp_vals)
+    statinfo = stat(file_path)
+    output_path = join("out", file_name + ".summary.json")
+    to_json(summary, output_path)
+    elapsed_time = time.time() - start_time
 
+    print "<<< Done : " + file_name
+    print "size: " + str(statinfo.st_size) + " time: %f" % elapsed_time
 
 if __name__=="__main__":
 
