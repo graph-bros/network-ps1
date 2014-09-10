@@ -28,7 +28,7 @@ def get_gsp(component):
     am = nx.adjacency_matrix(component)
     return gsp(am, directed=False)
 
-def get_summary(name, gsp_vals, giant_n, gn):
+def get_summary(name, gsp_vals, graph, giant_component):
     """
     generate summary result
     """
@@ -38,9 +38,14 @@ def get_summary(name, gsp_vals, giant_n, gn):
     number = len(gsp_vals)
     maximum = gsp_vals.max()
     mean = gsp_vals.mean()
-    summary[name] = {"number": number, "total": total,
-                     "max": maximum, "mean": mean,
-		             "giant_component_n": giant_n, "network_size": gn}
+    network_size = len(graph)
+    giant_component_n = len(giant_component)
+    summary[name] = {"number": number,
+                     "total": total,
+                     "max": maximum,
+                     "mean": mean,
+                     "network_size": network_size,
+                     "giant_component_n": giant_component_n}
     return summary
 
 def to_json(data, file_name):
@@ -56,17 +61,13 @@ def job(file_path):
 
     create graph from text file
     get the giant component
-    get the giant component size
-    the network size
     shortest paths for the giant component
     """
     g = nx.read_edgelist(file_path)
     giant_component = get_max_component(g)
-    giant_n = len(giant_component)
-    gn = len(g)
     gsp_vals = get_gsp(giant_component)
 
-    summary = get_summary(file_name, gsp_vals, giant_n, gn)
+    summary = get_summary(file_name, gsp_vals, g, giant_component)
     statinfo = stat(file_path)
     output_path = join("out", file_name + ".summary.json")
     to_json(summary, output_path)
