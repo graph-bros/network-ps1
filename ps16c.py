@@ -40,7 +40,7 @@ def get_summary(name, gsp_vals, giant_n, gn):
     mean = gsp_vals.mean()
     summary[name] = {"number": number, "total": total,
                      "max": maximum, "mean": mean,
-		     "giant_component_n": giant_n, "network_size": gn}
+		             "giant_component_n": giant_n, "network_size": gn}
     return summary
 
 def to_json(data, file_name):
@@ -66,7 +66,7 @@ def job(file_path):
     gn = len(g)
     gsp_vals = get_gsp(giant_component)
 
-    summary = get_summary(file_name, gsp_vals)
+    summary = get_summary(file_name, gsp_vals, giant_n, gn)
     statinfo = stat(file_path)
     output_path = join("out", file_name + ".summary.json")
     to_json(summary, output_path)
