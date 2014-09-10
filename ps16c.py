@@ -7,22 +7,22 @@ import networkx as nx
 from sklearn.utils.graph import graph_shortest_path as gsp
 
 
-def get_file_paths(root):
+def get_file_paths(root): 
     file_paths = []
     for f in listdir(root):
         if isfile((join(root, f))):
             file_paths.append(join(root, f))
     return file_paths
 
-def get_max_component(graph):
+def get_max_component(graph): # pass the giant component
     components = nx.connected_component_subgraphs(graph)
     return components.next()
 
-def get_gsp(component):
+def get_gsp(component): # calulate shortest path for all vertices
     am = nx.adjacency_matrix(component)
     return gsp(am, directed=False)
 
-def get_summary(name, gsp_vals):
+def get_summary(name, gsp_vals, giant_n, gn): # save summary results
     gsp_vals = gsp_vals[gsp_vals != 0]
     summary = {}
     total = gsp_vals.sum()
@@ -30,7 +30,8 @@ def get_summary(name, gsp_vals):
     maximum = gsp_vals.max()
     mean = gsp_vals.mean()
     summary[name] = {"number": number, "total": total,
-                     "max": maximum, "mean": mean}
+                     "max": maximum, "mean": mean,
+					 "giant_component_n": giant_n, "network_size": gn}
     return summary
 
 def to_json(data, file_name):
@@ -41,12 +42,14 @@ def job(file_path):
     print ">>> Doing: " + file_name
     start_time = time.time()
 
-    g = nx.read_edgelist(file_path)
-    giant_component = get_max_component(g)
-    gsp_vals = get_gsp(giant_component)
-    summary = get_summary(file_name, gsp_vals)
+    g = nx.read_edgelist(file_path) 		 # create graph from text file
+    giant_component = get_max_component(g)	 # get the giant component
+	giant_n = len(giant_component)			 # the giant component size
+	gn = len(g)							 	 # the network size
+    gsp_vals = get_gsp(giant_component)		 # shortest paths for the giant component
+    summary = get_summary(file_name, gsp_vals)   # summary results
     statinfo = stat(file_path)
-    output_path = join("out", file_name + ".summary.json")
+    output_path = join("out", file_name + ".summary.json")  
     to_json(summary, output_path)
     elapsed_time = time.time() - start_time
 
