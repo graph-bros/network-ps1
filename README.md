@@ -4,3 +4,5 @@ This is for a class (Network Analysis and Modeling) at CU Boulder
 http://tuvalu.santafe.edu/~aaronc/courses/5352/
 
 Problem set #1. 
+
+**created by Sanghee Kim & Choong-Wan Woo
